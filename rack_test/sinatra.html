@@ -228,7 +228,11 @@ Finished in 0.00052 seconds (files took 0.6769 seconds to load)
 1 example, 0 failures
 </code></pre>
 
-<p>Of course we haven&rsquo;t implemented any actual test, yet. So let&rsquo;s do that next.</p>
+<p>Of course we haven&rsquo;t implemented any actual test, yet.</p>
+
+<p>So let&rsquo;s do that next.</p>
+
+<h2>Taking notes first</h2>
 
 <p>Let&rsquo;s start adding tests in the order that the <a href="http://webapps-for-beginners.rubymonstas.org/exercises/sinatra_resource.html">exercise</a>
 specified.</p>
@@ -318,6 +322,8 @@ Finished in 0.0018 seconds (files took 0.59211 seconds to load)
 
 <p>Let&rsquo;s start filling them in.</p>
 
+<h2>Adding test implementation</h2>
+
 <p>Since Sinatra uses Rack under the hood we can apply all the techniques we&rsquo;ve
 learned while writing tests for our Rack app.</p>
 
@@ -379,6 +385,8 @@ compare the full HTML tag as a string.</p>
 But our test would break. That&rsquo;s called a brittle test.</p>
 
 <p>So what do we do?</p>
+
+<h2>HaveTag matcher</h2>
 
 <p>One option would be to use a regular expression, like so:</p>
 <pre class="highlight ruby"><code>    <span class="n">it</span> <span class="s2">"displays a list of member names that link to /members/:name"</span> <span class="k">do</span>
