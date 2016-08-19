@@ -154,7 +154,7 @@ the most basic one first.</p>
 
 <p>RSpec wants us to define tests in a file that ends with <code>_spec.rb</code>, so we store
 both our class and our test in the file <code>user_spec.rb</code>. Normally, in modern
-codebases, you&rsquo;d store your code in one file, and your tests in another file:</p>
+code bases, you&rsquo;d store your code in one file, and your tests in another file:</p>
 <pre class="highlight ruby"><code><span class="nb">require</span> <span class="s2">"date"</span>
 
 <span class="k">def</span> <span class="nf">leap_year?</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
@@ -207,11 +207,11 @@ domain of HTTP, i.e. writing web applications?</p>
 <p>RSpec is a DSL for the problem domain of writing tests (or &ldquo;specifications&rdquo;).</p>
 
 <p>While Sinatra defines methods such as <code>get</code>, <code>post</code>, <code>status</code>, <code>redirect</code>, and
-so on, RSpec defines methods like <code>describe</code>, <code>it</code>, and <code>expect</code>.</p>
+so on, RSpec defines methods like <code>describe</code>, <code>it</code>, <code>expect</code>, and <code>eq</code> (equal).</p>
 
-<p>Using these methods you can describe your expectations about your code, and
+<p>Using these methods we can describe our expectations about our code, and
 execute them. In RSpec&rsquo;s thinking, that&rsquo;s what tests are all about: expressing
-your expectations about the behaviour of your code. We <em>describe</em> the class
+our expectations about the behaviour of our code. We <em>describe</em> the class
 <code>User</code>, and specify our expectations.</p>
 
 <p>Instead of <code>it</code> you can also use <code>example</code>. That&rsquo;s exactly the same:</p>
@@ -268,13 +268,13 @@ there, too:</p>
 is born in a leap year&rdquo;, and then &ldquo;[in the same context] is at voting age&rdquo;.</p>
 
 <p>In short the methods <code>describe</code> and <code>context</code> are used to set up a logical
-structure for your tests. There needs to be at least one toplevel <code>describe</code>
+structure for your tests. There needs to be at least one top level <code>describe</code>
 block. This is the equivalent to defining a class that inherits from
 <code>Minitest::Test</code>.</p>
 
-<p>The method <code>it</code> (or its alias <code>example</code>) is then used to add the actual tests,
-i.e. that&rsquo;s the equivalent to defining methods that start with <code>test_</code> in
-Minitest.</p>
+<p>The method <code>it</code> (or one of its alias <code>example</code> and <code>specify</code>) is then used to
+add the actual tests, i.e. that&rsquo;s the equivalent to defining methods that start
+with <code>test_</code> in Minitest.</p>
 
 <p>Under the hood RSpec uses a lot of <a href="http://rubylearning.com/blog/2010/11/23/dont-know-metaprogramming-in-ruby/">metaprogramming</a>.
 I.e. RSpec has methods that, when called, define code, classes and methods,
@@ -285,7 +285,7 @@ your tests.</p>
 
 <p>That means, even though you&rsquo;re very familiar with Ruby, you&rsquo;ll still need to
 learn RSpec in order to use it effectively. That&rsquo;s one of the reasons why some
-Ruby developers dislike RSpec: It&rsquo;s not &ldquo;just Ruby&rdquo; any more. On the flipside,
+Ruby developers dislike RSpec: It&rsquo;s not &ldquo;just Ruby&rdquo; any more. On the flip side,
 it&rsquo;s extremely powerful, and comes with features that no other testing library
 has.</p>
 
@@ -300,8 +300,8 @@ Finished in 0.00204 seconds (files took 0.1559 seconds to load)
 
 <p>The dot indicates that there is exactly one test defined. RSpec calls tests
 &ldquo;examples&rdquo;. That&rsquo;s because they like to stress that tests shouldn&rsquo;t be so much
-about technical details, but about the behaviour that the user cares about.
-They like to say that we &ldquo;specify&rdquo; behaviour by the way of defining
+about technical details, but about the behavior that the user cares about.
+They like to say that we &ldquo;specify&rdquo; behavior by the way of defining
 &ldquo;examples&rdquo;.</p>
 
 <p>Let&rsquo;s break our test, and change the method <code>born_in_leap_year?</code> to always
@@ -335,7 +335,7 @@ rspec ./user_spec.rb:23 # User born in 2000 is born in a leap year
 </code></pre>
 
 <p>Wow, that&rsquo;s pretty comprehensive. RSpec tells us exactly what&rsquo;s going wrong,
-and where.</p>
+and where. So nice of them.</p>
 
         <nav class="page-nav"><a class="prev" href="/rspec.html">
   Previous

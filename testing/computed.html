@@ -149,7 +149,7 @@
         <nav class="menu"><a href="#"></a></nav>
         <h1>Computed tests</h1>
 
-<p>What if you have lots and lots of methods on lots of classes, and you want to
+<p>What if you have lots and lots of methods in lots of classes, and you want to
 make changes to them? You&rsquo;d need to output a lot of things, and inspect them
 very carefully in order to not miss any mistakes.</p>
 
@@ -158,7 +158,7 @@ outputs <code>false</code> for the first two years, and <code>true</code> for th
 That&rsquo;s a lot of knowledge to keep in mind for just one method. Imagine you&rsquo;d
 have hundreds of methods. You&rsquo;d need to very carefully inspect a lot of output.</p>
 
-<p>Isn&rsquo;t that what computers are there for? Doing all the tedius, mechanical work
+<p>Isn&rsquo;t that what computers are there for? Doing all the tedious, mechanical work
 for us that requires a lot of precision?</p>
 
 <p>Let&rsquo;s see. What if we, instead of outputting plain values to the terminal, also
@@ -193,7 +193,7 @@ leap_year?(2000) returned true as expected.
 leap_year?(2004) returned true as expected.
 </code></pre>
 
-<p>Lets try breaking our method by always returning <code>true</code>:</p>
+<p>Let&rsquo;s try breaking our method by always returning <code>true</code>:</p>
 <pre class="highlight ruby"><code><span class="k">def</span> <span class="nf">leap_year?</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
   <span class="kp">true</span>
 <span class="k">end</span>
@@ -208,7 +208,7 @@ leap_year?(2004) returned true as expected.
 
 <p>That&rsquo;s much better, isn&rsquo;t it? Even if you&rsquo;d have hundreds of tests (many
 real-world applications do have thousands) it would be pretty easy to spot
-any broken behaviour, right?</p>
+any broken behavior, right?</p>
 
         <nav class="page-nav"><a class="prev" href="/testing/separation.html">
   Previous

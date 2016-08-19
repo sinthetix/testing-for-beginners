@@ -62,7 +62,7 @@
       <priority>0.5</priority>
     </url>
     <url>
-      <loc>http://testing-for-beginners.rubymonstas.org/rspec/filtering.html</loc>
+      <loc>http://testing-for-beginners.rubymonstas.org/rspec.html</loc>
       <priority>0.5</priority>
     </url>
     <url>
@@ -86,7 +86,7 @@
       <priority>0.5</priority>
     </url>
     <url>
-      <loc>http://testing-for-beginners.rubymonstas.org/rspec.html</loc>
+      <loc>http://testing-for-beginners.rubymonstas.org/rspec/filtering.html</loc>
       <priority>0.5</priority>
     </url>
 </urlset>

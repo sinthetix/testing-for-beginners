@@ -290,10 +290,10 @@ test implementation later.</p>
 as RSpec test stubs.</p>
 
 <p>You can see how we&rsquo;re using nested <code>context</code> blocks here for the first time.
-This allows us to group our tests for the two cases of submitting a valid or
-invalid name.</p>
+This allows us to group our tests for the three cases of submitting a valid,
+duplicate, or empty name.</p>
 
-<p>If we run this, RSpec will tell us we have 15 &ldquo;pending&rdquo; tests to fill in:</p>
+<p>If we run this, RSpec will tell us we have 19 &ldquo;pending&rdquo; tests to fill in:</p>
 <pre class="highlight plaintext"><code>rspec -I . app_spec.rb
 ************
 
@@ -317,6 +317,13 @@ Finished in 0.0018 seconds (files took 0.59211 seconds to load)
 <p>Cool.</p>
 
 <p>Let&rsquo;s start filling them in.</p>
+
+<p>Since Sinatra uses Rack under the hood we can apply all the techniques we&rsquo;ve
+learned while writing tests for our Rack app.</p>
+
+<p>We can create a new application instance with <code>App.new</code>, and make requests
+using the <code>Rack::Test</code> helper methods <code>get</code>, <code>post</code>, and so on. These methods
+will return a response object that we can inspect in our tests:</p>
 <pre class="highlight ruby"><code><span class="nb">require</span> <span class="s2">"spec_helper"</span>
 
 <span class="n">describe</span> <span class="no">App</span> <span class="k">do</span>
@@ -363,9 +370,10 @@ Finished in 0.04964 seconds (files took 0.60312 seconds to load)
 it breaks too easily. It&rsquo;s not robust enough.</p>
 
 <p>In our case our specification says that there needs to be list of links that
-show the name, and link to the right path. However, our test would pass if
+show the name, and link to the right path. However, our test would fail if
 we would, for example, add a CSS class to the links, so we can style them
-more easily. Or if we&rsquo;d add any other HTML attributes to it.</p>
+more easily. Or if we&rsquo;d add any other HTML attributes to it. Because we simply
+compare the full HTML tag as a string.</p>
 
 <p>Our app would then still function the same, and comply with the specification.
 But our test would break. That&rsquo;s called a brittle test.</p>
@@ -426,7 +434,7 @@ Let&rsquo;s try that. We need to install the gem and add it to RSpec it in our
   <span class="k">end</span>
 </code></pre>
 
-<p>We can simply use all the same techniqes for the <code>GET /members/:name</code> route.
+<p>We can simply use all the same techniques for the <code>GET /members/:name</code> route.
 Nothing new here.</p>
 
 <p>These specs pass, too:</p>
@@ -505,16 +513,25 @@ and we&rsquo;ll need to introduce a few new concepts here.</p>
 
 <p>Except, they don&rsquo;t.</p>
 
+<h2>Leaking state</h2>
+
 <p>When we run these tests something curious happens. At first the second test
-(testing the status 302) passes, and the first one does not. From then on,
+(testing the status <code>302</code>) passes, and the first one does not. From then on,
 when we re-run the tests, the first one passes, and the second one doesn&rsquo;t.</p>
 
 <p>Why&rsquo;s that? This is a common problem in testing. Programmers say that &ldquo;tests
 leak state&rdquo;. By that they mean that there is something that persists state
-(data), and this state is modified in our tests. Now whenever we run our tests
-the state persisted in one test can influence the next test. Thus, it leaks.</p>
+(data), this state is modified when we run our tests, and our tests rely on it.
+Now whenever we run our tests the state persisted in one test can influence the
+next test. Thus, it leaks.</p>
 
-<p>In our case this is the file <code>members.txt</code> of course.</p>
+<p>In our case this is the file <code>members.txt</code> of course. More precisely, our tests
+rely on the assumption that the name <code>Monsta</code> is not in the persistent file
+<code>members.text</code>.</p>
+
+<p>But when we run our tests the first test that executes will add it, and save
+the file. All other tests from then on run against a <em>different</em> persistent
+state than the first one. That is bad.</p>
 
 <p>We can fix that by resetting the contents of the file <code>members.txt</code> to the
 same state before or after each test run. Let&rsquo;s do that:</p>
@@ -531,11 +548,18 @@ same state before or after each test run. Let&rsquo;s do that:</p>
 <p>I.e. for each of our tests, before RSpec runs it, it will execute the <code>before</code>
 block first, and write the same content to the file.</p>
 
+<p>This is an important concept in testing: You want your tests to always run
+against the same state. If anything is persisted, e.g. in our file, in a
+database, or anywhere else, we need to apply extra measures to make sure
+this state is reset everytime we run a single test.</p>
+
 <p>Cool. When we now run the tests we still get a failure. Our first test still
 does not pass. However, we now get the same failure no matter how often we run
 it.</p>
 
 <p>So what&rsquo;s wrong with the first test?</p>
+
+<h2>Side effects</h2>
 
 <p>If you think about it, we run the actual <code>POST</code> request in the <code>let(:response)</code>
 statement. And so far, all of our tests have somehow used the <code>response</code>.
@@ -545,8 +569,10 @@ results.</p>
 <p>However, this one test now does not use <code>response</code> at all. It looks at the file
 contents instead. In programming, this is called a <a href="http://programmers.stackexchange.com/questions/40297/what-is-a-side-effect">side effect</a>.
 We test something that is not returned from the method call that we need to
-execute. And our test accidentally revealed that we&rsquo;re testing a side effect
-here.</p>
+execute, and therefore our test happens to not make that method call at all.
+You could also say that our test happens to reveal that we&rsquo;re testing a side
+effect here. In this way tests can be diagnostic, and tell us things about
+our code that we haven&rsquo;t noticed before.</p>
 
 <p>In web applications side effects are expected: we do want to store (persist)
 some data in our text file, or in the database. However, it is also good to
@@ -574,15 +600,21 @@ Finished in 0.04476 seconds (files took 0.64694 seconds to load)
 2 examples, 0 failures
 </code></pre>
 
-<p>However, calling <code>response</code> in this place seems kind of weird. It does not
-really convey that all we want to do is make the <code>POST</code> request here.</p>
+<p>However, calling <code>response</code> in this place seems kind of weird, does it not? We
+don&rsquo;t actually use the response object here. And the line does not really
+convey that all we want to do is make the <code>POST</code> request here.</p>
 
-<p>So what&rsquo;s an alternative. RSpec has another variation of the <code>let</code> method that
-makes this more visible: <code>let!</code>.</p>
+<p>So what&rsquo;s an alternative?</p>
+
+<h2>Let!</h2>
+
+<p>RSpec has another variation of the <code>let</code> method that makes this more visible:
+<code>let!</code>.</p>
 
 <p><code>let!</code> is useful in exactly such situations: We need to evaluate the
-<code>response</code>, and we want to mark this as a side effect. The same line then also
-hints that we&rsquo;re making a <code>POST</code> request.</p>
+<code>response</code>, because we need to tests a side effect. And we want to mark this as
+an exceptional thing. The same line then also hints that we&rsquo;re making a <code>POST</code>
+request.</p>
 
 <p>That seems like a good compromise, let&rsquo;s use it:</p>
 <pre class="highlight ruby"><code>  <span class="n">context</span> <span class="s2">"POST to /members"</span> <span class="k">do</span>
@@ -602,6 +634,8 @@ hints that we&rsquo;re making a <code>POST</code> request.</p>
 <p>Ok, this looks great. Our tests pass, and we&rsquo;re using another nice RSpec
 feature.</p>
 
+<h2>Custom matchers</h2>
+
 <p>What&rsquo;s next? What about our redirect test? It would be nice if we could use a
 matcher for that:</p>
 <pre class="highlight ruby"><code>      <span class="n">it</span> <span class="s2">"redirects to /members/:name"</span> <span class="k">do</span>
@@ -620,16 +654,22 @@ our own custom matcher for this:</p>
 </code></pre>
 
 <p>Looks alright? We compare the actual response status to 302, and we compare the
-response header <code>Location</code> to a URL that has our path. What&rsquo;s with the
-<code>example.org</code> business though? As mentioned at some point in the Webapps for
-Beginners book, a redirect header needs to be a full URL as per the HTTP
-specification. So our Sinatra app turns the path into a full URL. Since we
-haven&rsquo;t specified any other hostname in our app it just adds this fantasy
-domain.</p>
+response header <code>Location</code> to a URL that has our path.</p>
 
-<p>This, again, is a brittle. What if we configure a proper hostname for our
-app at some point? Our tests then would fail, even though it would function as
-expected.</p>
+<p>What&rsquo;s with the <code>example.org</code> business though? As mentioned at some point in
+the Webapps for Beginners book, a redirect header needs to be a full URL as per
+the HTTP specification. So our Sinatra app turns the path into a full URL.
+Since we haven&rsquo;t specified any other hostname in our app it just adds this
+fantasy domain name.</p>
+
+<p>This works, the given test would pass.</p>
+
+<p>Can you spot a problem with it though?</p>
+
+<p>Our matcher, again, is a brittle. What if we configure a proper hostname for
+our app at some point? Our tests then would fail, even though the application
+code would function as expected. Our tests would be too brittle, and fail when
+they should pass.</p>
 
 <p>Let&rsquo;s fix that, and parse the URL, so we can compare the path only:</p>
 <pre class="highlight ruby"><code><span class="nb">require</span> <span class="s1">'uri'</span>
@@ -644,10 +684,11 @@ expected.</p>
 
 <p>Now, that&rsquo;s much better.</p>
 
-<p>Another aspect that is a little brittle, too, is that we test for a very specific
-status code. According to the HTTP specification all status codes that start with
-a 3 are considered <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection">redirects</a>.
-So let&rsquo;s fix that, too.</p>
+<p>There&rsquo;s one more aspect that is a little brittle, too: we test for a very
+specific status code. According to the HTTP specification all status codes that
+start with a <code>3</code> are considered <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection">redirects</a>.</p>
+
+<p>So let&rsquo;s fix that, too.</p>
 <pre class="highlight ruby"><code><span class="no">RSpec</span><span class="o">::</span><span class="no">Matchers</span><span class="p">.</span><span class="nf">define</span><span class="p">(</span><span class="ss">:redirect_to</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">path</span><span class="o">|</span>
   <span class="n">match</span> <span class="k">do</span> <span class="o">|</span><span class="n">response</span><span class="o">|</span>
     <span class="n">uri</span> <span class="o">=</span> <span class="no">URI</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="nf">headers</span><span class="p">[</span><span class="s1">'Location'</span><span class="p">])</span>
@@ -657,7 +698,7 @@ end
 </span></code></pre>
 
 <p>This is a trick, of course. The response status code is an <code>Integer</code>. So if we
-devide it by <code>100</code> we&rsquo;ll get another <code>Integer</code>, in our case <code>3</code>, with any
+divide it by <code>100</code> we&rsquo;ll get another <code>Integer</code>, in our case <code>3</code>, with any
 decimals cut off.</p>
 
 <p>We could also turn the number into a string and inspect the first character:</p>
@@ -685,6 +726,8 @@ Finished in 0.039 seconds (files took 0.69768 seconds to load)
 </code></pre>
 
 <p>It does! Very nice.</p>
+
+<h2>Shared examples</h2>
 
 <p>Let&rsquo;s fill in the tests for the next case, posting a duplicate name. We can
 mostly steal from the tests we&rsquo;ve already written for the <code>GET /members/new</code>
@@ -727,8 +770,6 @@ different contexts. And this is exactly what&rsquo;s really useful for us here.<
 
 <p>Let&rsquo;s move our tests from the last context to a shared example group like so:</p>
 <pre class="highlight ruby"><code>    <span class="n">shared_examples_for</span> <span class="s2">"invalid member data"</span> <span class="k">do</span>
-      <span class="n">let!</span><span class="p">(</span><span class="ss">:response</span><span class="p">)</span> <span class="p">{</span> <span class="n">post</span> <span class="s2">"/members"</span><span class="p">,</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"Maren"</span> <span class="p">}</span>
-
       <span class="n">it</span> <span class="s2">"does not add the name to the members.txt file"</span> <span class="k">do</span>
         <span class="n">expect</span><span class="p">(</span><span class="n">file</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="s2">"Anja</span><span class="se">\n</span><span class="s2">Maren"</span>
       <span class="k">end</span>
@@ -754,10 +795,12 @@ member data:</p>
     <span class="k">end</span>
 
     <span class="n">context</span> <span class="s2">"given a duplicate name"</span> <span class="k">do</span>
+      <span class="n">let!</span><span class="p">(</span><span class="ss">:response</span><span class="p">)</span> <span class="p">{</span> <span class="n">post</span> <span class="s2">"/members"</span><span class="p">,</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"Maren"</span> <span class="p">}</span>
       <span class="n">include_examples</span> <span class="s2">"invalid member data"</span>
     <span class="k">end</span>
 
     <span class="n">context</span> <span class="s2">"given an empty name"</span> <span class="k">do</span>
+      <span class="n">let!</span><span class="p">(</span><span class="ss">:response</span><span class="p">)</span> <span class="p">{</span> <span class="n">post</span> <span class="s2">"/members"</span><span class="p">,</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">""</span> <span class="p">}</span>
       <span class="n">include_examples</span> <span class="s2">"invalid member data"</span>
     <span class="k">end</span>
 </code></pre>

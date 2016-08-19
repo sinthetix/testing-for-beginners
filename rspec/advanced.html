@@ -153,7 +153,7 @@
 descriptive, succinct, and concise tests that focus on the few things we really
 care about.</p>
 
-<p>So far our tests, using the most basic style, look something like this:</p>
+<p>So far, our tests, using the most basic style, look something like this:</p>
 <pre class="highlight ruby"><code><span class="n">describe</span> <span class="no">User</span> <span class="k">do</span>
   <span class="n">context</span> <span class="s2">"born in 2001"</span> <span class="k">do</span>
     <span class="n">it</span> <span class="s2">"is not born in a leap year"</span> <span class="k">do</span>
@@ -189,9 +189,12 @@ care about.</p>
 Wouldn&rsquo;t it be nice to move this to a shared place, like Minitest&rsquo;s <code>setup</code>
 method?</p>
 
-<p>RSpec calls this feature <code>before</code>. This is just another method that RSpec
-defines, and it takes a block, too. RSpec will call (execute) this block before
-each of the tests (examples):</p>
+<h2>Before</h2>
+
+<p>RSpec has the same feature, but it calls it <code>before</code>.</p>
+
+<p>This is just another method that RSpec defines, and it takes a block, too.
+RSpec will call (execute) this block before each one of the tests (examples):</p>
 <pre class="highlight ruby"><code><span class="n">describe</span> <span class="no">User</span> <span class="k">do</span>
   <span class="n">before</span> <span class="p">{</span> <span class="vi">@user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"Francisca"</span><span class="p">,</span> <span class="s2">"2001-01-01"</span><span class="p">)</span> <span class="p">}</span>
 
@@ -210,16 +213,21 @@ each of the tests (examples):</p>
 </code></pre>
 
 <p>Our <code>before</code> block sets up an instance variable <code>@user</code> so that our test then
-can use it.</p>
+can use it. That&rsquo;s cool.</p>
 
-<p>However, we now have a problem: The hardcoded birthday is specific to the first
+<p>However, we now have a problem: The hard coded birthday is specific to the first
 context, and should be different for each one of our contexts, because that&rsquo;s
 the one single piece of data that changes. The second test would use the wrong
-year, and therefore fail.</p>
+year, and therefore fail, because it would use a user that is actually born in
+<code>2000</code>, not <code>2001</code>, despite what the context desciption tells.</p>
 
-<p>RSpec comes with another feature to help with this: <code>let</code> allows us to define
-such bits of data that need to be specified per context. Here&rsquo;s how that looks
-like:</p>
+<p>So how do we fix that?</p>
+
+<h2>Let</h2>
+
+<p>RSpec comes with another feature to help with this: the method <code>let</code> allows us
+to define such bits of data (or more precisely, objects) that need to be
+specified per context. Here&rsquo;s how that looks like:</p>
 <pre class="highlight ruby"><code><span class="n">describe</span> <span class="no">User</span> <span class="k">do</span>
   <span class="n">before</span> <span class="p">{</span> <span class="vi">@user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"Francisca"</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">year</span><span class="si">}</span><span class="s2">-01-01"</span><span class="p">)</span> <span class="p">}</span>
 
@@ -270,18 +278,21 @@ can also use <code>let</code> to setup the user:</p>
 <span class="k">end</span>
 </code></pre>
 
-<p>This is a pretty common way of writing RSpec tests. The <code>let(:user)</code> statement
-defines the <code>user</code>, and as you can see, this statement is common to both
-contexts: they both use <code>user</code>.</p>
+<p>This actually is a pretty common way of writing RSpec tests.</p>
+
+<p>The <code>let(:user)</code> statement defines the <code>user</code>, and as you can see, this
+statement is common to both contexts: they both use <code>user</code>.</p>
 
 <p>The <code>let(:year)</code> statements however, are specific to the contexts, and define
 the <code>year</code> for each one of the contexts.</p>
+
+<h2>Subject and Should</h2>
 
 <p>Now <code>user</code> is the object under test, and it is an instance of the class <code>User</code>
 which is already mentioned in the <code>describe</code> statement. So, in a way, this is
 a little repetitive.</p>
 
-<p>Because this is such a common pattern RSpec comes with another feature to make
+<p>Because this is such a common pattern, RSpec comes with another feature to make
 this a little more concise, and remove this repetition: <code>subject</code>. We can use
 it like so:</p>
 <pre class="highlight ruby"><code><span class="n">describe</span> <span class="no">User</span> <span class="k">do</span>
@@ -314,8 +325,12 @@ defines a shorthand for <code>expect(subject).to</code> that we can use if we ha
 </code></pre>
 
 <p>This works great. And we&rsquo;ve reduced the amount of code we have to type by
-a great deal. However, what&rsquo;s with the duplication in the <code>it</code> message,
-and the actual code that implements our expectation?</p>
+a great deal.</p>
+
+<p>However, what&rsquo;s with the duplication in the <code>it</code> message, and the actual code
+that implements our expectation?</p>
+
+<h2>Anonymous it</h2>
 
 <p>The lines <code>it &quot;is born in a leap year&quot;</code> and <code>should be_born_in_leap_year</code>
 pretty much describe the same thing, don&rsquo;t they?</p>
@@ -332,10 +347,12 @@ whole test on one line, like so:</p>
 <span class="k">end</span>
 </code></pre>
 
-<p>Woha.</p>
+<p>Whoa.</p>
 
-<p>Let&rsquo;s apply this to all of our tests. We can implement the same test case we&rsquo;ve
-had before like this:</p>
+<p>Let&rsquo;s apply this to all of our tests.</p>
+
+<p>We can implement the same test case we&rsquo;ve had before (at the beginning of this
+chapter) like this, using all the advanced features we&rsquo;ve just learned:</p>
 <pre class="highlight ruby"><code><span class="n">describe</span> <span class="no">User</span> <span class="k">do</span>
   <span class="n">subject</span> <span class="p">{</span> <span class="no">User</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"Francisca"</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">year</span><span class="si">}</span><span class="s2">-01-01"</span><span class="p">)</span> <span class="p">}</span>
 
@@ -361,6 +378,8 @@ had before like this:</p>
 <span class="k">end</span>
 </code></pre>
 
+<p>You decide which one you like better.</p>
+
 <p>The output will look a wee bit different, but just as readable, even though we
 haven&rsquo;t written out the extra description on the <code>it</code> block:</p>
 <pre class="highlight plaintext"><code>$ rspec --format doc user_spec.rb
@@ -383,9 +402,13 @@ Finished in 0.00462 seconds (files took 0.1464 seconds to load)
 
 <ul>
 <li><code>let</code> allows you to dynamically define a method that will return the given
-value. We use this to define the only varying bit of data: the <code>year</code>.</li>
+value. We use this to define the only varying bit of data: the <code>year</code>.
+It is important to note that <code>let</code> memoizes the result. I.e. it only calls
+the block once. Also, it only executes the block when you actually call it.</li>
 <li><code>subject</code> is a convenience helper that lets us specify the &ldquo;thing&rdquo; that
-is under test. In our case that&rsquo;s a <code>User</code> instance.</li>
+is under test. In our case that&rsquo;s a <code>User</code> instance. <code>subject</code> also memoizes
+the result. And just like <code>let</code>, it also only executes the block when you
+actually call it.</li>
 <li><code>should</code> assumes that we want to test the <code>subject</code>. It is a shorthand for
 <code>expect(subject).to</code> (while <code>should_not</code> is the corresponding shorthand for
 <code>expect(subject).not_to</code>).</li>
@@ -395,11 +418,12 @@ is under test. In our case that&rsquo;s a <code>User</code> instance.</li>
 significantly.</p>
 
 <p>The first version (&ldquo;basic style&rdquo;) of our tests had 715 characters on 29 lines.
-This new version has 474 characters on 23 lines. That&rsquo;s a massive reduction,
-and allows us to focus much more on the relevant differences.</p>
+This new version has 474 characters on 23 lines. That&rsquo;s a massive reduction
+(~30% less characters to type and read), and allows us to focus much more on
+the relevant differences.</p>
 
 <p>However, it also requires for us to learn these RSpec features, and get
-familiar with how to implement such tests properly.</p>
+familiar with how to implement and understand such tests properly.</p>
 
         <nav class="page-nav"><a class="prev" href="/rspec/format.html">
   Previous

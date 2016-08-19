@@ -217,7 +217,7 @@ even allows us to define our own, custom matchers.</p>
 <span class="k">end</span>
 </code></pre>
 
-<p>However, we&rsquo;d mix styles here. That&rsquo;s not a bad thing, really. But wouldn&rsquo;t it
+<p>However, we&rsquo;d mix styles here. That&rsquo;s not a bad thing, really! But wouldn&rsquo;t it
 be cool if we could say this instead?</p>
 <pre class="highlight ruby"><code><span class="n">describe</span> <span class="no">User</span> <span class="k">do</span>
   <span class="n">subject</span> <span class="p">{</span> <span class="no">User</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"Francisca"</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">year</span><span class="si">}</span><span class="s2">-01-01"</span><span class="p">)</span> <span class="p">}</span>
@@ -232,12 +232,12 @@ be cool if we could say this instead?</p>
 
 <p>If we were to execute this, RSpec would try to call the method <code>named?</code> on our
 <code>User</code> instance (just like <code>be_born_in_leap_year</code> calls <code>born_in_leap_year?</code> on
-the user), and that method does not exist. Obviously we don&rsquo;t want to add any
-such methods to our application code, just so we can make the tests more
-pretty.</p>
+the user), and that method does not exist. We could add that method <code>named?</code> to
+our <code>User</code> class, but we don&rsquo;t really want to add any such methods to our real
+code, just so we can make the tests more pretty.</p>
 
-<p>Instead, we can define a custom matcher <code>be_named</code> that inspects the user&rsquo;s
-<code>name</code>:</p>
+<p>Instead, we can define a <a href="https://www.relishapp.com/rspec/rspec-expectations/v/2-4/docs/custom-matchers/define-matcher">custom matcher</a>
+<code>be_named</code> that inspects the user&rsquo;s <code>name</code>:</p>
 <pre class="highlight ruby"><code><span class="no">RSpec</span><span class="o">::</span><span class="no">Matchers</span><span class="p">.</span><span class="nf">define</span><span class="p">(</span><span class="ss">:be_named</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">expected</span><span class="o">|</span>
   <span class="n">match</span> <span class="k">do</span> <span class="o">|</span><span class="n">object</span><span class="o">|</span>
     <span class="n">object</span><span class="p">.</span><span class="nf">name</span> <span class="o">==</span> <span class="n">expected</span>
@@ -245,13 +245,13 @@ pretty.</p>
 <span class="k">end</span>
 </code></pre>
 
-<p>Apparently, a matcher is a block that calls a method <code>match</code> that takes another
-block. The actual and expected values are passed as arguments to the two
-blocks, somehow. Inside the inner block we are supposed to return <code>true</code> or
-<code>false</code> depending if the matcher is supposed to &ldquo;match&rdquo;.</p>
+<p>Hmmmm, &hellip; apparently a matcher is a block that calls a method <code>match</code> that
+takes another block. The actual and expected values are passed as arguments to
+the two blocks, somehow. Inside the inner block we are supposed to return
+<code>true</code> or <code>false</code> depending if the matcher is supposed to &ldquo;match&rdquo;.</p>
 
-<p>Hmmmm, well, we don&rsquo;t really have to understand how exactly this works in
-detail: We can just slap it at the end of our file, and run it:</p>
+<p>Ok, well, we don&rsquo;t really have to understand how exactly this works in detail:
+We can just slap it at the end of our file, and run it:</p>
 <pre class="highlight plaintext"><code>$ rspec --format doc user_spec.rb
 
 User
@@ -263,7 +263,13 @@ Finished in 0.00267 seconds (files took 0.15704 seconds to load)
 2 examples, 0 failures
 </code></pre>
 
-<p>Yay! How cool is that.</p>
+<p>Yay!</p>
+
+<p>Now, how cool is that.</p>
+
+<p>With those five lines of Ruby code we&rsquo;ve extended RSpec to include a matcher
+that is pretty specific to our code. And now we can use the advanced style
+in order to test our <code>name</code> method.</p>
 
         <nav class="page-nav"><a class="prev" href="/rspec/advanced.html">
   Previous

@@ -149,7 +149,7 @@
         <nav class="menu"><a href="#"></a></nav>
         <h1>Separating test code</h1>
 
-<p>Here&rsquo;s one trick that has been used a lot in early days of Ruby development:</p>
+<p>Here&rsquo;s one trick that has been used a lot in the early days of Ruby development:</p>
 <pre class="highlight ruby"><code><span class="k">def</span> <span class="nf">leap_year?</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
   <span class="n">year</span> <span class="o">%</span> <span class="mi">400</span> <span class="o">==</span> <span class="mi">0</span> <span class="n">or</span> <span class="n">year</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">!=</span> <span class="mi">0</span> <span class="n">and</span> <span class="n">year</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span>
 <span class="k">end</span>
@@ -170,7 +170,7 @@ leap_year.rb</code> then you&rsquo;ll get the same output as above.</p>
 else) then you would not get this output.</p>
 
 <p>You can try this out quickly on the command line:</p>
-<pre class="highlight plaintext"><code>$ ruby -r leap.rb -e "p leap_year?(1996)"
+<pre class="highlight plaintext"><code>$ ruby -r leap_year.rb -e "p leap_year?(1996)"
 true
 </code></pre>
 
@@ -193,15 +193,15 @@ other languages that existed when Matz designed Ruby in the 90s, especially
 Perl, in this case.</p>
 
 <p>The variable <code>$0</code> is a global variable (hence the dollar sign <code>$</code>) that holds
-the name of the Ruby file that was given on the command line, as in <code>ruby
-leap_year.rb</code>.</p>
+the name of the Ruby file that was given on the command line. So if you run
+<code>ruby leap_year.rb</code>, then <code>$0</code> will contain <code>&quot;leap_year.rb&quot;</code></p>
 
-<p>The varialbe <code>__FILE__</code> on the other hand is defined in every Ruby file, and
+<p>The variable <code>__FILE__</code> on the other hand is defined in every Ruby file, and
 contains the file name of this exact file. If we execute <code>ruby leap_year.rb</code>
 then these two names will be the same. If we execute any other ruby code that
 requires the file <code>leap_year.rb</code> though, then they will not be the same.</p>
 
-<p>We can further improve our test code by making it less repititive, and abstract
+<p>We can further improve our test code by making it less repetitive, and abstract
 it:</p>
 <pre class="highlight ruby"><code><span class="k">def</span> <span class="nf">leap_year?</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
   <span class="n">year</span> <span class="o">%</span> <span class="mi">400</span> <span class="o">==</span> <span class="mi">0</span> <span class="n">or</span> <span class="n">year</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">!=</span> <span class="mi">0</span> <span class="n">and</span> <span class="n">year</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span>
@@ -215,7 +215,7 @@ it:</p>
 </code></pre>
 
 <p>Exercise: Try going to back to the <a href="http://ruby-for-beginners.rubymonstas.org/">Ruby for Beginners</a>
-book and add some tests to some of the exercises you made.</p>
+book and add some tests to some of the exercises you did.</p>
 
         <nav class="page-nav"><a class="prev" href="/testing/output.html">
   Previous
