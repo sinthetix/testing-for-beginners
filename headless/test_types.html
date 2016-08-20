@@ -10,22 +10,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google-site-verification" content="BEd2YAbpSQrRqU2-5wUifTTzvqTMGLLE269b0JZTfCs" />
 
-    <title>Testing for Beginners</title>
+    <title>Types of tests | Testing for Beginners</title>
 
-    <link href="assets/stylesheets/monstas-4fb1ecb5.css" rel="stylesheet" type="text/css" />
+    <link href="../assets/stylesheets/monstas-4fb1ecb5.css" rel="stylesheet" type="text/css" />
   </head>
 
   <body>
     <nav class="page-nav"></nav>
-    <nav class="page-nav"><a class="next" href="/preface.html">
-  Next
-</a></nav>
+    <nav class="page-nav"></nav>
 
     <div>
       <nav class="toc">
         <h1>Contents</h1>
         <ul>
-  <li class="active">
+  <li>
     <a href="/index.html">
       Testing For Beginners
     </a>
@@ -167,35 +165,33 @@
       </nav>
       <article>
         <nav class="menu"><a href="#"></a></nav>
-        <h1>Testing For Beginners</h1>
+        <h1>Types of tests</h1>
 
-<p><em><a href="http://rubymonstas.org">Ruby Monday Study Group</a> curriculum for advanced intermediates</em></p>
+<p>TBD</p>
 
-<p>This book teaches the basics of testing software.</p>
+<h2>One assertion per test</h2>
 
-<p>It has been written after we have run several groups at our <a href="http://rubymonstas.org">Ruby
-Monstas</a> groups in Berlin over the course of 4 years.
-These groups start as beginners groups, learning <a href="http://ruby-for-beginners.rubymonstas.org/">Ruby</a>,
-then turn into intermediate groups learning the basics of building
-<a href="http://webapps-for-beginners.rubymonstas.org/">web applications</a>.
-They normally then start building their first Rails application as
-a group, and get in touch with the concept of testing.</p>
+<p>You may have noticed that our tests so far, ever since we&rsquo;ve written our own
+little <code>Test</code> class, had followed a certain rule: Every test tested one single
+thing. For example in the RSpec tests that test the <code>User</code> class, and it&rsquo;s
+<code>born_in_leap_year?</code> method every test tests the return value of that method in
+a given context. That&rsquo;s one assertion per test.</p>
 
-<p>After completing this book you&rsquo;ll have a basic understanding of:</p>
+<p>Now with Capybara we have tested things by the way of using them, and then,
+eventually, made some assertions about the resulting page.</p>
 
-<ul>
-<li>Why writing tests is a good thing.</li>
-<li>What concepts are relevant for writing tests.</li>
-<li>What libraries exist for making writing tests easy.</li>
-<li>What services can be used to help with your tests and code quality.</li>
-</ul>
+<p>For example, we make sure that a certain link is there by the way of clicking
+it, not using an actual assertion method. We then made sure that a certain
+input field with a label tag was on the page, by the way of filling it in.
+So while we were using the page we have made assumptions about the elements
+on the page.</p>
 
-<p>You can find the source code of this book <a href="https://github.com/rubymonsters/testing-for-beginners">here</a>.</p>
+<p>This way we&rsquo;ve made several assertions in one single test.</p>
+
+<h2>Using stubs vs real resources</h2>
 
         <nav class="page-nav"></nav>
-        <nav class="page-nav"><a class="next" href="/preface.html">
-  Next
-</a></nav>
+        <nav class="page-nav"></nav>
       </article>
     </div>
 
@@ -213,7 +209,7 @@ a group, and get in touch with the concept of testing.</p>
       </ul>
     </footer>
 
-    <script src="assets/javascripts/modernizr-4c875d94.js" type="text/javascript"></script>
-    <script src="assets/javascripts/monstas-79961449.js" type="text/javascript"></script>
+    <script src="../assets/javascripts/modernizr-4c875d94.js" type="text/javascript"></script>
+    <script src="../assets/javascripts/monstas-79961449.js" type="text/javascript"></script>
   </body>
 </html>
